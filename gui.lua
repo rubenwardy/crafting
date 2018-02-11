@@ -21,15 +21,15 @@ function crafting.make_result_selector(player, type, page, size)
 			local itemname = ItemStack(recipe.output):get_name()
 			local item_description = get_item_description(itemname)
 
-			formspec[#formspec + 1] = "button["
+			formspec[#formspec + 1] = "item_image_button["
 			formspec[#formspec + 1] = x
 			formspec[#formspec + 1] = ","
 			formspec[#formspec + 1] = y + 0.5
-			formspec[#formspec + 1] = ";1,1;result_"
+			formspec[#formspec + 1] = ";1,1;"
 			formspec[#formspec + 1] = recipe.output
-			formspec[#formspec + 1] = ";"
-			formspec[#formspec + 1] = item_description
-			formspec[#formspec + 1] = "]"
+			formspec[#formspec + 1] = ";result_"
+			formspec[#formspec + 1] = minetest.formspec_escape(recipe.output)
+			formspec[#formspec + 1] = ";]"
 
 			formspec[#formspec + 1] = "tooltip[result_"
 			formspec[#formspec + 1] = recipe.output
