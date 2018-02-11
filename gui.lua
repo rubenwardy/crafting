@@ -28,11 +28,11 @@ function crafting.make_result_selector(player, type, page, size)
 			formspec[#formspec + 1] = ";1,1;"
 			formspec[#formspec + 1] = recipe.output
 			formspec[#formspec + 1] = ";result_"
-			formspec[#formspec + 1] = minetest.formspec_escape(recipe.output)
+			formspec[#formspec + 1] = tostring(recipe.id)
 			formspec[#formspec + 1] = ";]"
 
 			formspec[#formspec + 1] = "tooltip[result_"
-			formspec[#formspec + 1] = recipe.output
+			formspec[#formspec + 1] = tostring(recipe.id)
 			formspec[#formspec + 1] = ";"
 			formspec[#formspec + 1] = minetest.formspec_escape(item_description .. "\n")
 			for j, item in pairs(result.items) do
@@ -61,6 +61,21 @@ function crafting.make_result_selector(player, type, page, size)
 		if y == size.y then
 			break
 		end
+	end
+
+	while y < size.y do
+		while x < size.x do
+			formspec[#formspec + 1] = "image["
+			formspec[#formspec + 1] = tostring(x)
+			formspec[#formspec + 1] = ","
+			formspec[#formspec + 1] = tostring(y + 0.5)
+			formspec[#formspec + 1] = ";1,1;gui_hb_bg.png]"
+
+			x = x + 1
+			i = i + 1
+		end
+		x = 0
+		y = y + 1
 	end
 
 	return table.concat(formspec, "")

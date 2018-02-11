@@ -34,6 +34,13 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
+	output = "default:stone",
+	items  = { "default:gravel 3" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "default:sword_wood",
 	items  = { "default:wood 2", "default:stick" },
 	always_known = true,
