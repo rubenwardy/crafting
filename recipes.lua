@@ -24,3 +24,52 @@ crafting.register_recipe({
 	items  = { "default:stick", "default:coal" },
 	always_known = true,
 })
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:stone",
+	items  = { "default:cobble" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:sword_wood",
+	items  = { "default:wood 2", "default:stick" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:pick_stone",
+	items  = { "default:cobble 3", "default:stick 2" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:sword_stone",
+	items  = { "default:cobble 2", "default:stick" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:pick_steel",
+	items  = { "default:steel_ingot 3", "default:stick 2" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:stick",
+	items  = { "default:wood" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:tree",
+	items  = { "default:wood" },
+	always_known = true,
+})

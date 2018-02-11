@@ -4,7 +4,6 @@ package.path = '../../?.lua;' .. -- tests root
 
 require("crafting/tests/dummy")
 require("crafting/api")
-local crafting = _G.crafting -- Suppress mutating global warning
 
 local recipe1 = {
 	type   = "test",
