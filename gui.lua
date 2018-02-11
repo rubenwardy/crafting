@@ -3,7 +3,8 @@ local function get_item_description(name)
 	return def.description or name
 end
 
-function crafting.make_result_selector(player, type, page, size)
+function crafting.make_result_selector(player, type, size, context)
+	local page = context.crafting_page or 1
 	local craftable, uncraftable = crafting.get_all_for_player(player, type)
 
 	local formspec = {}
@@ -97,12 +98,31 @@ function crafting.make_result_selector(player, type, page, size)
 	return table.concat(formspec, "")
 end
 
+function crafting.result_select_on_receive_results(player, type, context, fields)
+	for key, value in pairs(fields) do
+		if key:sub(1, 7) == "result_" then
+			local num = string.match(key, "result_([0-9]+)")
+			if num then
+				local inv    = player:get_inventory()
+				local recipe = crafting.get_recipe(tonumber(num))
+				if crafting.has_required_items(inv, recipe) then
+					crafting.perform_craft(inv, recipe)
+				else
+					minetest.chat_send_player(player:get_player_name(), "Missing required items!")
+				end
+			end
+		end
+	end
+end
+
 sfinv.override_page("sfinv:crafting", {
 	get = function(self, player, context)
-		local page = context.crafting_page or 1
-		local formspec = crafting.make_result_selector(player, "inv", page, { x = 8, y = 3 })
+		local formspec = crafting.make_result_selector(player, "inv", { x = 8, y = 3 }, context)
 		formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
 				"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
 		return sfinv.make_formspec(player, context, formspec, true)
 	end,
+	on_player_receive_fields = function(self, player, context, fields)
+		return crafting.result_select_on_receive_results(player, "inv", context, fields)
+	end
 })

@@ -17,7 +17,8 @@
 
 
 crafting = {
-	recipes = {}
+	recipes = {},
+	recipes_by_id = {},
 }
 
 function crafting.register_type(name)
@@ -35,7 +36,12 @@ function crafting.register_recipe(def)
 
 	recipe_counter = recipe_counter + 1
 	def.id = recipe_counter
+	crafting.recipes_by_id[recipe_counter] = def
 	tab[#tab + 1] = def
+end
+
+function crafting.get_recipe(id)
+	return crafting.recipes_by_id[id]
 end
 
 function crafting.get_all(type, item_hash, unlocked)
@@ -105,4 +111,51 @@ function crafting.get_all_for_player(player, type)
 	end
 
 	return crafting.get_all(type, item_hash, unlocked)
+end
+
+local function give_all_to_player(inv, list)
+	for _, item in pairs(list) do
+		inv:add_item("main", item)
+	end
+end
+
+function crafting.has_required_items(inv, recipe)
+	for _, item in pairs(recipe.items) do
+		item = ItemStack(item)
+		if item:get_name():sub(1, 6) == "group:" then
+			minetest.log("error", "Unimplemented: group support")
+			return false
+		else
+			if not inv:contains_item("main", item) then
+				return false
+			end
+		end
+	end
+
+	return true
+end
+
+function crafting.perform_craft(inv, recipe)
+	-- Take items
+	local taken = {}
+	for _, item in pairs(recipe.items) do
+		item = ItemStack(item)
+		if item:get_name():sub(1, 6) == "group:" then
+			minetest.log("error", "Unimplemented: group support")
+			give_all_to_player(inv, taken)
+			return false
+		else
+			local took = inv:remove_item("main", item)
+			if took:get_count() ~= item:get_count() then
+				minetest.log("error", "Unexpected lack of items in inventory")
+				give_all_to_player(inv, taken)
+				return false
+			end
+		end
+	end
+
+	-- Add output
+	inv:add_item("main", recipe.output)
+
+	return true
 end
