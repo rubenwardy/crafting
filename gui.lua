@@ -1,3 +1,8 @@
+local function get_item_description(name)
+	local def = minetest.registered_items[name] or {}
+	return def.description or name
+end
+
 function crafting.make_result_selector(player, type, page, size)
 	local craftable, uncraftable = crafting.get_all_for_player(player, type)
 
@@ -10,9 +15,12 @@ function crafting.make_result_selector(player, type, page, size)
 	local y = 0
 	local i = 1
 	for set_id, set in pairs({ craftable, uncraftable }) do
-		for _, recipe in pairs(set) do
+		for _, result in pairs(set) do
+			local recipe = result.recipe
+
 			local itemname = ItemStack(recipe.output):get_name()
-			local def = minetest.registered_items[itemname] or {}
+			local item_description = get_item_description(itemname)
+
 			formspec[#formspec + 1] = "button["
 			formspec[#formspec + 1] = x
 			formspec[#formspec + 1] = ","
@@ -20,7 +28,24 @@ function crafting.make_result_selector(player, type, page, size)
 			formspec[#formspec + 1] = ";1,1;result_"
 			formspec[#formspec + 1] = recipe.output
 			formspec[#formspec + 1] = ";"
-			formspec[#formspec + 1] = def.description or recipe.output
+			formspec[#formspec + 1] = item_description
+			formspec[#formspec + 1] = "]"
+
+			formspec[#formspec + 1] = "tooltip[result_"
+			formspec[#formspec + 1] = recipe.output
+			formspec[#formspec + 1] = ";"
+			formspec[#formspec + 1] = minetest.formspec_escape(item_description .. "\n")
+			for j, item in pairs(result.items) do
+				local color = item.have > item.need and "#6f6" or "#f66"
+				local itemtab = {
+					"\n",
+					minetest.get_color_escape_sequence(color),
+					get_item_description(item.name), ": ",
+					item.have, "/", item.need
+				}
+				formspec[#formspec + 1] = minetest.formspec_escape(table.concat(itemtab, ""))
+			end
+			formspec[#formspec + 1] = minetest.get_color_escape_sequence("#ffffff")
 			formspec[#formspec + 1] = "]"
 
 			x = x + 1

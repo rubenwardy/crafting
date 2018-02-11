@@ -46,19 +46,33 @@ function crafting.get_all(type, item_hash, unlocked)
 
 		if recipe.always_known or unlocked[recipe.output] then
 			-- Check all ingredients are available
+			local items = {}
 			for _, item in pairs(recipe.items) do
 				item = ItemStack(item)
-				local available_count = item_hash[item:get_name()]
-				if not available_count or available_count < item:get_count() then
+				local needed_count = item:get_count()
+
+				local available_count = item_hash[item:get_name()] or 0
+				if available_count < needed_count then
 					craftable = false
-					break
 				end
+
+				items[#items + 1] = {
+					name = item:get_name(),
+					have = available_count,
+					need = needed_count,
+				}
 			end
 
 			if craftable then
-				ret_craftable[#ret_craftable + 1] = recipe
+				ret_craftable[#ret_craftable + 1] = {
+					recipe = recipe,
+					items  = items,
+				}
 			else
-				ret_uncraftable[#ret_uncraftable + 1] = recipe
+				ret_uncraftable[#ret_uncraftable + 1] = {
+					recipe = recipe,
+					items  = items,
+				}
 			end
 		end
 	end
@@ -75,13 +89,13 @@ function crafting.get_all_for_player(player, type)
 	for _, stack in pairs(inv:get_list("main")) do
 		if not stack:is_empty() then
 			local itemname = stack:get_name()
-			item_hash[itemname] = (item_hash[itemname] or 0) + 1
+			item_hash[itemname] = (item_hash[itemname] or 0) + stack:get_count()
 
 			local def = minetest.registered_items[itemname]
 			if def.groups then
 				for _, group in pairs(def.groups) do
 					local groupname = "group:" .. group
-					item_hash[groupname] = (item_hash[groupname] or 0) + 1
+					item_hash[groupname] = (item_hash[groupname] or 0) + stack:get_count()
 				end
 			end
 		end
