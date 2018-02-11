@@ -38,6 +38,8 @@ function crafting.register_recipe(def)
 	def.id = recipe_counter
 	crafting.recipes_by_id[recipe_counter] = def
 	tab[#tab + 1] = def
+
+	return def.id
 end
 
 function crafting.get_recipe(id)
