@@ -12,7 +12,23 @@ end
 
 function crafting.make_result_selector(player, type, size, context)
 	local page = context.crafting_page or 1
+
 	local recipes = crafting.get_all_for_player(player, type)
+	if context.crafting_query then
+		local tmp = recipes
+		recipes = {}
+
+		for i = 1, #tmp do
+			local output = tmp[i].recipe.output
+			local desc   = get_item_description(output)
+			if string.find(output, context.crafting_query, 1, true) or
+					string.find(desc, context.crafting_query, 1, true) then
+				recipes[#recipes + 1] = tmp[i]
+			end
+		end
+	end
+
+
 	local num_per_page = size.x * size.y
 	local max_pages = math.floor(0.999 + #recipes / num_per_page)
 	if page > max_pages or page < 1 then
@@ -30,8 +46,10 @@ function crafting.make_result_selector(player, type, size, context)
 	formspec[#formspec + 1] = tostring(size.y)
 	formspec[#formspec + 1] = "]"
 
-	formspec[#formspec + 1] = "field[-4.75,0.81;3,0.8;query;;]"
-	formspec[#formspec + 1] = "button[-2.2,0.5;0.8,0.8;search;?]"
+	formspec[#formspec + 1] = "field_close_on_enter[query;false]"
+	formspec[#formspec + 1] = "field[-4.75,0.81;3,0.8;query;;"
+	formspec[#formspec + 1] = context.crafting_query
+	formspec[#formspec + 1] = "]button[-2.2,0.5;0.8,0.8;search;?]"
 	formspec[#formspec + 1] = "button[-1.4,0.5;0.8,0.8;prev;<]"
 	formspec[#formspec + 1] = "button[-0.8,0.5;0.8,0.8;next;>]"
 
@@ -124,6 +142,13 @@ function crafting.result_select_on_receive_results(player, type, context, fields
 		return true
 	elseif fields.next then
 		context.crafting_page = (context.crafting_page or 1) + 1
+		return true
+	elseif fields.search or fields.key_enter_field == "query" then
+		context.crafting_query = fields.query:trim()
+		context.crafting_page  = 1
+		if context.crafting_query == "" then
+			context.crafting_query = nil
+		end
 		return true
 	end
 
