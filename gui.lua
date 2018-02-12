@@ -31,7 +31,7 @@ function crafting.make_result_selector(player, type, size, context)
 
 
 	formspec[#formspec + 1] = "label[0,-0.25;Unlocked: "
-	formspec[#formspec + 1] = minetest.formspec_escape("8 / 8")
+	formspec[#formspec + 1] = minetest.formspec_escape(#recipes .. " / " .. #crafting.recipes[type])
 	formspec[#formspec + 1] = "]"
 
 	local x = 0
