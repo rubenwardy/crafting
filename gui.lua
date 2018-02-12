@@ -13,19 +13,21 @@ end
 function crafting.make_result_selector(player, type, size, context)
 	local page = context.crafting_page or 1
 
-	local recipes = crafting.get_all_for_player(player, type)
+	local full_recipes = crafting.get_all_for_player(player, type)
+	local recipes
 	if context.crafting_query then
-		local tmp = recipes
 		recipes = {}
 
-		for i = 1, #tmp do
-			local output = tmp[i].recipe.output
+		for i = 1, #full_recipes do
+			local output = full_recipes[i].recipe.output
 			local desc   = get_item_description(output)
 			if string.find(output, context.crafting_query, 1, true) or
 					string.find(desc, context.crafting_query, 1, true) then
-				recipes[#recipes + 1] = tmp[i]
+				recipes[#recipes + 1] = full_recipes[i]
 			end
 		end
+	else
+		recipes = full_recipes
 	end
 
 
@@ -59,7 +61,7 @@ function crafting.make_result_selector(player, type, size, context)
 	formspec[#formspec + 1] = "label[0,-0.25;"
 	formspec[#formspec + 1] = minetest.formspec_escape("Page: " ..
 			page .. "/" .. max_pages ..
-			" | Unlocked: " .. #recipes .. " / " .. #crafting.recipes[type])
+			" | Unlocked: " .. #full_recipes .. " / " .. #crafting.recipes[type])
 	formspec[#formspec + 1] = "]"
 
 	local x = 0
