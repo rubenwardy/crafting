@@ -20,7 +20,7 @@ function crafting.make_result_selector(player, type, size, context)
 
 		for i = 1, #full_recipes do
 			local output = full_recipes[i].recipe.output
-			local desc   = get_item_description(output)
+			local desc   = get_item_description(output):lower()
 			if string.find(output, context.crafting_query, 1, true) or
 					string.find(desc, context.crafting_query, 1, true) then
 				recipes[#recipes + 1] = full_recipes[i]
@@ -146,7 +146,7 @@ function crafting.result_select_on_receive_results(player, type, context, fields
 		context.crafting_page = (context.crafting_page or 1) + 1
 		return true
 	elseif fields.search or fields.key_enter_field == "query" then
-		context.crafting_query = fields.query:trim()
+		context.crafting_query = fields.query:trim():lower()
 		context.crafting_page  = 1
 		if context.crafting_query == "" then
 			context.crafting_query = nil
