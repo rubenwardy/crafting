@@ -12,7 +12,7 @@ end
 
 function crafting.make_result_selector(player, type, size, context)
 	local page = context.crafting_page or 1
-	local craftable, uncraftable = crafting.get_all_for_player(player, type)
+	local recipes = crafting.get_all_for_player(player, type)
 
 	local formspec = {}
 
@@ -38,59 +38,54 @@ function crafting.make_result_selector(player, type, size, context)
 	local y = 0
 	local y_offset = 0.2
 	local i = 1
-	for set_id, set in pairs({ craftable, uncraftable }) do
-		for _, result in pairs(set) do
-			local recipe = result.recipe
+	for _, result in pairs(recipes) do
+		local recipe = result.recipe
 
-			local itemname = ItemStack(recipe.output):get_name()
-			local item_description = get_item_description(itemname)
+		local itemname = ItemStack(recipe.output):get_name()
+		local item_description = get_item_description(itemname)
 
-			formspec[#formspec + 1] = "item_image_button["
-			formspec[#formspec + 1] = x
-			formspec[#formspec + 1] = ","
-			formspec[#formspec + 1] = y + y_offset
-			formspec[#formspec + 1] = ";1,1;"
-			formspec[#formspec + 1] = recipe.output
-			formspec[#formspec + 1] = ";result_"
-			formspec[#formspec + 1] = tostring(recipe.id)
-			formspec[#formspec + 1] = ";]"
+		formspec[#formspec + 1] = "item_image_button["
+		formspec[#formspec + 1] = x
+		formspec[#formspec + 1] = ","
+		formspec[#formspec + 1] = y + y_offset
+		formspec[#formspec + 1] = ";1,1;"
+		formspec[#formspec + 1] = recipe.output
+		formspec[#formspec + 1] = ";result_"
+		formspec[#formspec + 1] = tostring(recipe.id)
+		formspec[#formspec + 1] = ";]"
 
-			formspec[#formspec + 1] = "tooltip[result_"
-			formspec[#formspec + 1] = tostring(recipe.id)
-			formspec[#formspec + 1] = ";"
-			formspec[#formspec + 1] = minetest.formspec_escape(item_description .. "\n")
-			for j, item in pairs(result.items) do
-				local color = item.have >= item.need and "#6f6" or "#f66"
-				local itemtab = {
-					"\n",
-					minetest.get_color_escape_sequence(color),
-					get_item_description(item.name), ": ",
-					item.have, "/", item.need
-				}
-				formspec[#formspec + 1] = minetest.formspec_escape(table.concat(itemtab, ""))
-			end
-			formspec[#formspec + 1] = minetest.get_color_escape_sequence("#ffffff")
-			formspec[#formspec + 1] = "]"
+		formspec[#formspec + 1] = "tooltip[result_"
+		formspec[#formspec + 1] = tostring(recipe.id)
+		formspec[#formspec + 1] = ";"
+		formspec[#formspec + 1] = minetest.formspec_escape(item_description .. "\n")
+		for j, item in pairs(result.items) do
+			local color = item.have >= item.need and "#6f6" or "#f66"
+			local itemtab = {
+				"\n",
+				minetest.get_color_escape_sequence(color),
+				get_item_description(item.name), ": ",
+				item.have, "/", item.need
+			}
+			formspec[#formspec + 1] = minetest.formspec_escape(table.concat(itemtab, ""))
+		end
+		formspec[#formspec + 1] = minetest.get_color_escape_sequence("#ffffff")
+		formspec[#formspec + 1] = "]"
 
-			formspec[#formspec + 1] = "image["
-			formspec[#formspec + 1] = x
-			formspec[#formspec + 1] = ","
-			formspec[#formspec + 1] = y + y_offset
-			if result.craftable then
-				formspec[#formspec + 1] = ";1,1;crafting_slot_craftable.png]"
-			else
-				formspec[#formspec + 1] = ";1,1;crafting_slot_uncraftable.png]"
-			end
+		formspec[#formspec + 1] = "image["
+		formspec[#formspec + 1] = x
+		formspec[#formspec + 1] = ","
+		formspec[#formspec + 1] = y + y_offset
+		if result.craftable then
+			formspec[#formspec + 1] = ";1,1;crafting_slot_craftable.png]"
+		else
+			formspec[#formspec + 1] = ";1,1;crafting_slot_uncraftable.png]"
+		end
 
-			x = x + 1
-			i = i + 1
-			if x == size.x then
-				x = 0
-				y = y + 1
-			end
-			if y == size.y then
-				break
-			end
+		x = x + 1
+		i = i + 1
+		if x == size.x then
+			x = 0
+			y = y + 1
 		end
 		if y == size.y then
 			break

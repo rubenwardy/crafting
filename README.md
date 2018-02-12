@@ -30,11 +30,17 @@ be used twice: `default:wood, group:wood`.
 	* Get recipe by ID
 
 * crafting.get_all_for_player(player, type)
-	* Returns a tuple: `craftable`, `uncraftable`
+	* Returns a list of results, each a table
+		* `items` - a key-value table, key being item name and value being a table:
+			* `have` - how many the player has
+			* `need` - how many of this item needed
+		* `recipe` - the recipe
+		* `craftable` - is craftable?		
 	* `craftable` is a table of the items the player can craft with the items they have.
 	* `uncraftable` is a table of items the player knows about, but is missing items for.
 
 * crafting.get_all(type, item_hash, unlocked)
+	* Returns same as above.
 	* `item_hash` - a table with keys being item names or group names (eg: `group:wood`)
 	                and the value being the number required.
 	* `unlocked`  - a list of outputs the player has unlocked.

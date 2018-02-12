@@ -49,8 +49,7 @@ end
 function crafting.get_all(type, item_hash, unlocked)
 	assert(crafting.recipes[type], "No such craft type!")
 
-	local ret_craftable   = {}
-	local ret_uncraftable = {}
+	local results = {}
 
 	for _, recipe in pairs(crafting.recipes[type]) do
 		local craftable = true
@@ -74,21 +73,15 @@ function crafting.get_all(type, item_hash, unlocked)
 				}
 			end
 
-			local result = {
+			results[#results + 1] = {
 				recipe    = recipe,
 				items     = items,
 				craftable = craftable,
 			}
-
-			if craftable then
-				ret_craftable[#ret_craftable + 1] = result
-			else
-				ret_uncraftable[#ret_uncraftable + 1] = result
-			end
 		end
 	end
 
-	return ret_craftable, ret_uncraftable
+	return results
 end
 
 function crafting.get_all_for_player(player, type)
