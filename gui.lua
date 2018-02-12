@@ -60,7 +60,7 @@ function crafting.make_result_selector(player, type, size, context)
 			formspec[#formspec + 1] = ";"
 			formspec[#formspec + 1] = minetest.formspec_escape(item_description .. "\n")
 			for j, item in pairs(result.items) do
-				local color = item.have > item.need and "#6f6" or "#f66"
+				local color = item.have >= item.need and "#6f6" or "#f66"
 				local itemtab = {
 					"\n",
 					minetest.get_color_escape_sequence(color),
