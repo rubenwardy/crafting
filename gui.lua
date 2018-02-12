@@ -1,6 +1,13 @@
+
+
 local function get_item_description(name)
-	local def = minetest.registered_items[name] or {}
-	return def.description or name
+	if name:sub(1, 6) == "group:" then
+		local group = name:sub(7, #name):gsub("%_", " ")
+		return "Any " .. group
+	else
+		local def = minetest.registered_items[name] or {}
+		return def.description or name
+	end
 end
 
 function crafting.make_result_selector(player, type, size, context)
