@@ -13,6 +13,14 @@ end
 function crafting.make_result_selector(player, type, size, context)
 	local page = context.crafting_page or 1
 	local recipes = crafting.get_all_for_player(player, type)
+	local num_per_page = size.x * size.y
+	local max_pages = math.floor(0.999 + #recipes / num_per_page)
+	if page > max_pages or page < 1 then
+		page = ((page - 1) % max_pages) + 1
+		context.crafting_page = page
+	end
+
+	local start_i  = (page - 1) * num_per_page + 1
 
 	local formspec = {}
 
@@ -22,7 +30,7 @@ function crafting.make_result_selector(player, type, size, context)
 	formspec[#formspec + 1] = tostring(size.y)
 	formspec[#formspec + 1] = "]"
 
-	formspec[#formspec + 1] = "field[-4.75,0.81;3,0.8;prev;;]"
+	formspec[#formspec + 1] = "field[-4.75,0.81;3,0.8;query;;]"
 	formspec[#formspec + 1] = "button[-2.2,0.5;0.8,0.8;search;?]"
 	formspec[#formspec + 1] = "button[-1.4,0.5;0.8,0.8;prev;<]"
 	formspec[#formspec + 1] = "button[-0.8,0.5;0.8,0.8;next;>]"
@@ -30,15 +38,17 @@ function crafting.make_result_selector(player, type, size, context)
 	formspec[#formspec + 1] = "container_end[]"
 
 
-	formspec[#formspec + 1] = "label[0,-0.25;Unlocked: "
-	formspec[#formspec + 1] = minetest.formspec_escape(#recipes .. " / " .. #crafting.recipes[type])
+	formspec[#formspec + 1] = "label[0,-0.25;"
+	formspec[#formspec + 1] = minetest.formspec_escape("Page: " ..
+			page .. "/" .. max_pages ..
+			" | Unlocked: " .. #recipes .. " / " .. #crafting.recipes[type])
 	formspec[#formspec + 1] = "]"
 
 	local x = 0
 	local y = 0
 	local y_offset = 0.2
-	local i = 1
-	for _, result in pairs(recipes) do
+	for i = start_i, math.min(#recipes, start_i * num_per_page)  do
+		local result = recipes[i]
 		local recipe = result.recipe
 
 		local itemname = ItemStack(recipe.output):get_name()
@@ -82,7 +92,6 @@ function crafting.make_result_selector(player, type, size, context)
 		end
 
 		x = x + 1
-		i = i + 1
 		if x == size.x then
 			x = 0
 			y = y + 1
@@ -101,7 +110,6 @@ function crafting.make_result_selector(player, type, size, context)
 			formspec[#formspec + 1] = ";1,1;crafting_slot_empty.png]"
 
 			x = x + 1
-			i = i + 1
 		end
 		x = 0
 		y = y + 1
@@ -111,6 +119,14 @@ function crafting.make_result_selector(player, type, size, context)
 end
 
 function crafting.result_select_on_receive_results(player, type, context, fields)
+	if fields.prev then
+		context.crafting_page = (context.crafting_page or 1) - 1
+		return true
+	elseif fields.next then
+		context.crafting_page = (context.crafting_page or 1) + 1
+		return true
+	end
+
 	for key, value in pairs(fields) do
 		if key:sub(1, 7) == "result_" then
 			local num = string.match(key, "result_([0-9]+)")
