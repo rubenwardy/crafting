@@ -74,16 +74,16 @@ function crafting.get_all(type, item_hash, unlocked)
 				}
 			end
 
+			local result = {
+				recipe    = recipe,
+				items     = items,
+				craftable = craftable,
+			}
+
 			if craftable then
-				ret_craftable[#ret_craftable + 1] = {
-					recipe = recipe,
-					items  = items,
-				}
+				ret_craftable[#ret_craftable + 1] = result
 			else
-				ret_uncraftable[#ret_uncraftable + 1] = {
-					recipe = recipe,
-					items  = items,
-				}
+				ret_uncraftable[#ret_uncraftable + 1] = result
 			end
 		end
 	end

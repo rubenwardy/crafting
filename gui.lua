@@ -72,6 +72,16 @@ function crafting.make_result_selector(player, type, size, context)
 			formspec[#formspec + 1] = minetest.get_color_escape_sequence("#ffffff")
 			formspec[#formspec + 1] = "]"
 
+			formspec[#formspec + 1] = "image["
+			formspec[#formspec + 1] = x
+			formspec[#formspec + 1] = ","
+			formspec[#formspec + 1] = y + y_offset
+			if result.craftable then
+				formspec[#formspec + 1] = ";1,1;crafting_slot_craftable.png]"
+			else
+				formspec[#formspec + 1] = ";1,1;crafting_slot_uncraftable.png]"
+			end
+
 			x = x + 1
 			i = i + 1
 			if x == size.x then
@@ -93,7 +103,7 @@ function crafting.make_result_selector(player, type, size, context)
 			formspec[#formspec + 1] = tostring(x)
 			formspec[#formspec + 1] = ","
 			formspec[#formspec + 1] = tostring(y + y_offset)
-			formspec[#formspec + 1] = ";1,1;gui_hb_bg.png]"
+			formspec[#formspec + 1] = ";1,1;crafting_slot_empty.png]"
 
 			x = x + 1
 			i = i + 1
