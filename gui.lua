@@ -134,6 +134,9 @@ sfinv.override_page("sfinv:crafting", {
 		return sfinv.make_formspec(player, context, formspec, true)
 	end,
 	on_player_receive_fields = function(self, player, context, fields)
-		return crafting.result_select_on_receive_results(player, "inv", context, fields)
+		if crafting.result_select_on_receive_results(player, "inv", context, fields) then
+			sfinv.set_player_inventory_formspec(player)
+		end
+		return true
 	end
 })
