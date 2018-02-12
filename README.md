@@ -39,13 +39,16 @@ be used twice: `default:wood, group:wood`.
 	                and the value being the number required.
 	* `unlocked`  - a list of outputs the player has unlocked.
 
-* crafting.has_required_items(inv, recipe)
+* crafting.find_required_items(inv, listname, recipe)
+	* Returns a list of stacks to take, or nil if the required items could not
+	  be found.
+
+* crafting.has_required_items(inv, listname, recipe)
 	* Returns true if the `"main"` list in `inv` contains the required items.
 
-* crafting.perform_craft(inv, recipe)
-	* Will take items and put output in the `"main"` list in `inv`.
-	* You should check `has_required_items` first, however the function will
-	  rollback if any items are not available.
+* crafting.perform_craft(inv, listname, recipe)
+	* Will try to take items and put output in the `"main"` list in `inv`.
+	* Returns true on success.
 
 * crafting.make_result_selector(player, type, size, context)
 	* Generates a paginated form which a search box.

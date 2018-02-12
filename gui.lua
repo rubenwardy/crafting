@@ -105,10 +105,14 @@ function crafting.result_select_on_receive_results(player, type, context, fields
 			if num then
 				local inv    = player:get_inventory()
 				local recipe = crafting.get_recipe(tonumber(num))
-				if crafting.has_required_items(inv, recipe) then
-					crafting.perform_craft(inv, recipe)
+				if not crafting.can_craft(player, type, recipe) then
+					minetest.log("error", "[crafting] Player clicked a button they shouldn't have been able to")
+					return true
+				elseif crafting.perform_craft(inv, "main", recipe) then
+					return true -- crafted
 				else
 					minetest.chat_send_player(player:get_player_name(), "Missing required items!")
+					return false
 				end
 			end
 		end

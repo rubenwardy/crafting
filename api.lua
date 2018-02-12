@@ -92,7 +92,8 @@ function crafting.get_all(type, item_hash, unlocked)
 end
 
 function crafting.get_all_for_player(player, type)
-	local unlocked = {}   -- TODO
+	-- TODO: unlocked crafts
+	local unlocked = {}
 
 	-- Get items hashed
 	local item_hash = {}
@@ -104,9 +105,9 @@ function crafting.get_all_for_player(player, type)
 
 			local def = minetest.registered_items[itemname]
 			if def.groups then
-				for _, group in pairs(def.groups) do
-					local groupname = "group:" .. group
-					item_hash[groupname] = (item_hash[groupname] or 0) + stack:get_count()
+				for groupname, _ in pairs(def.groups) do
+					local group = "group:" .. groupname
+					item_hash[group] = (item_hash[group] or 0) + stack:get_count()
 				end
 			end
 		end
@@ -115,44 +116,86 @@ function crafting.get_all_for_player(player, type)
 	return crafting.get_all(type, item_hash, unlocked)
 end
 
+function crafting.can_craft(player, type, recipe)
+	-- TODO: unlocked crafts
+	local unlocked = {}
+
+	return recipe.type == type and (recipe.always_known or unlocked[recipe.output])
+end
+
 local function give_all_to_player(inv, list)
 	for _, item in pairs(list) do
 		inv:add_item("main", item)
 	end
 end
 
-function crafting.has_required_items(inv, recipe)
+function crafting.find_required_items(inv, listname, recipe)
+	local items = {}
 	for _, item in pairs(recipe.items) do
 		item = ItemStack(item)
+
+		local itemname = item:get_name()
 		if item:get_name():sub(1, 6) == "group:" then
-			minetest.log("error", "Unimplemented: group support")
-			return false
+			local groupname = itemname:sub(7, #itemname)
+			local required = item:get_count()
+
+			-- Find stacks in group
+			for i = 1, inv:get_size(listname) do
+				local stack = inv:get_stack(listname, i)
+
+				-- Is it in group?
+				local def = minetest.registered_items[stack:get_name()]
+				if def and def.groups and def.groups[groupname] then
+					stack = ItemStack(stack)
+					if stack:get_count() > required then
+						stack:set_count(required)
+					end
+					items[#items + 1] = stack
+
+					required = required - stack:get_count()
+
+					if required == 0 then
+						break
+					end
+				end
+			end
+
+			if required > 0 then
+				return nil
+			end
 		else
-			if not inv:contains_item("main", item) then
-				return false
+			if inv:contains_item(listname, item) then
+				items[#items + 1] = item
+			else
+				return nil
 			end
 		end
 	end
 
-	return true
+	return items
 end
 
-function crafting.perform_craft(inv, recipe)
+function crafting.has_required_items(inv, listname, recipe)
+	return crafting.find_required_items(inv, listname, recipe) ~= nil
+end
+
+function crafting.perform_craft(inv, listname, recipe)
+	local items = crafting.find_required_items(inv, listname, recipe)
+	if not items then
+		return false
+	end
+
 	-- Take items
 	local taken = {}
-	for _, item in pairs(recipe.items) do
+	for _, item in pairs(items) do
 		item = ItemStack(item)
-		if item:get_name():sub(1, 6) == "group:" then
-			minetest.log("error", "Unimplemented: group support")
+
+		local took = inv:remove_item(listname, item)
+		taken[#taken + 1] = took
+		if took:get_count() ~= item:get_count() then
+			minetest.log("error", "Unexpected lack of items in inventory")
 			give_all_to_player(inv, taken)
 			return false
-		else
-			local took = inv:remove_item("main", item)
-			if took:get_count() ~= item:get_count() then
-				minetest.log("error", "Unexpected lack of items in inventory")
-				give_all_to_player(inv, taken)
-				return false
-			end
 		end
 	end
 

@@ -27,8 +27,22 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
+	output = "default:wood",
+	items  = { "group:stone" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "default:stone",
-	items  = { "default:cobble" },
+	items  = { "default:wood" },
+	always_known = true,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:cobble",
+	items  = { "default:wood" },
 	always_known = true,
 })
 
