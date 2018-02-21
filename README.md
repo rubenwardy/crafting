@@ -67,3 +67,6 @@ be used twice: `default:wood, group:wood`.
 * crafting.result_select_on_receive_results(player, type, level, context, fields)
 	* Handles form submissions for the result selector.
 	* Returns true if the formspec should be shown again.
+
+* crafting.make_on_rightclick(type, level, inv_size)
+	* Returns a function to be used as on_rightclick for node work stations.

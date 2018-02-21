@@ -189,3 +189,64 @@ function crafting.result_select_on_receive_results(player, type, level, context,
 		end
 	end
 end
+
+
+sfinv.override_page("sfinv:crafting", {
+	get = function(self, player, context)
+		local formspec = crafting.make_result_selector(player, "inv", 1, { x = 8, y = 3 }, context)
+		formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
+				"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
+		return sfinv.make_formspec(player, context, formspec, true)
+	end,
+	on_player_receive_fields = function(self, player, context, fields)
+		if crafting.result_select_on_receive_results(player, "inv", 1, context, fields) then
+			sfinv.set_player_inventory_formspec(player)
+		end
+		return true
+	end
+})
+
+local node_fs_context = {}
+local node_serial = 0
+
+function crafting.make_on_rightclick(type, level, inv_size)
+	node_serial = node_serial + 1
+	local formname = "crafting:node_" .. node_serial
+
+	local function show(player, context)
+		local formspec = crafting.make_result_selector(player, type, level, inv_size, context)
+		formspec = "size[" .. inv_size.x  .. "," .. (inv_size.y + 5.6) .. "]bgcolor[#080808BB;true]" .. default.gui_bg ..
+			default.gui_bg_img .. formspec .. default.gui_slots .. [[
+				list[current_player;main;0,4.7;8,1;]
+				list[current_player;main;0,5.85;8,3;8]
+			]]
+		minetest.show_formspec(player:get_player_name(), formname, formspec)
+	end
+
+	minetest.register_on_player_receive_fields(function(player, _formname, fields)
+		if formname ~= _formname then
+			return
+		end
+
+		local context = node_fs_context[player:get_player_name()]
+		if not context then
+			return false
+		end
+
+		if crafting.result_select_on_receive_results(player, type, level, context, fields) then
+			sfinv.set_player_inventory_formspec(player)
+		end
+		return true
+	end)
+
+	return function(pos, node, player)
+		local name = player:get_player_name()
+		local context = node_fs_context[name] or {}
+		node_fs_context[name] = context
+		context.pos   = vector.new(pos)
+		context.type  = type
+		context.level = level
+
+		show(player, context)
+	end
+end

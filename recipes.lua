@@ -34,6 +34,12 @@ sfinv.override_page("sfinv:crafting", {
 	end
 })
 
+minetest.register_node("crafting:work_bench", {
+	description = "Work Bench",
+	groups = { snappy = 1 },
+	on_rightclick = crafting.make_on_rightclick("inv", 2, { x = 8, y = 3 }),
+})
+
 
 -- Recipes
 
