@@ -53,23 +53,25 @@ describe("Getting all outputs", function()
 	assert.equals(crafting.recipes["test"][2].output, recipe2.output)
 
 	it("get with no items", function()
-		local craftable, uncraftable = crafting.get_all("test", {}, {})
-		assert.equals(0, #craftable)
-		assert.equals(2, #uncraftable)
+		local recipes = crafting.get_all("test", 1, {}, {})
+		assert.equals(2, #recipes)
 
-		assert.equals(recipe1, uncraftable[1].recipe)
-		assert.equals(recipe2, uncraftable[2].recipe)
+		assert.equals(recipe1, recipes[1].recipe)
+		assert.equals(recipe2, recipes[2].recipe)
+		assert.is_false(recipes[1].craftable)
+		assert.is_false(recipes[2].craftable)
 	end)
 
 	it("get with right for one", function()
 		local items_hash = {}
 		items_hash["default:cobble"] = 1
 
-		local craftable, uncraftable = crafting.get_all("test", items_hash, {})
-		assert.equals(1, #craftable)
-		assert.equals(1, #uncraftable)
+		local recipes = crafting.get_all("test", 1, items_hash, {})
+		assert.equals(2, #recipes)
 
-		assert.equals(recipe2, craftable[1].recipe)
-		assert.equals(recipe1, uncraftable[1].recipe)
+		assert.equals(recipe1, recipes[1].recipe)
+		assert.equals(recipe2, recipes[2].recipe)
+		assert.is_false(recipes[1].craftable)
+		assert.is_true(recipes[2].craftable)
 	end)
 end)

@@ -16,7 +16,23 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dofile(minetest.get_modpath("crafting") .. "/api.lua")
-dofile(minetest.get_modpath("crafting") .. "/gui.lua")
-dofile(minetest.get_modpath("crafting") .. "/recipes.lua")
-dofile(minetest.get_modpath("crafting") .. "/stations.lua")
+sfinv.override_page("sfinv:crafting", {
+	get = function(self, player, context)
+		local formspec = crafting.make_result_selector(player, "inv", 1, { x = 8, y = 3 }, context)
+		formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
+				"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
+		return sfinv.make_formspec(player, context, formspec, true)
+	end,
+	on_player_receive_fields = function(self, player, context, fields)
+		if crafting.result_select_on_receive_results(player, "inv", 1, context, fields) then
+			sfinv.set_player_inventory_formspec(player)
+		end
+		return true
+	end
+})
+
+minetest.register_node("crafting:work_bench", {
+	description = "Work Bench",
+	groups = { snappy = 1 },
+	on_rightclick = crafting.make_on_rightclick("inv", 2, { x = 8, y = 3 }),
+})

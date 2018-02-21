@@ -17,4 +17,5 @@ read_globals = {
 	-- Testing
 	"describe",
 	"it",
+	"assert",
 }
