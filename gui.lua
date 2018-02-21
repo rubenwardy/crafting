@@ -1,3 +1,19 @@
+-- Crafting Mod - semi-realistic crafting in minetest
+-- Copyright (C) 2018 rubenwardy <rw@rubenwardy.com>
+--
+-- This library is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU Lesser General Public
+-- License as published by the Free Software Foundation; either
+-- version 2.1 of the License, or (at your option) any later version.
+--
+-- This library is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-- Lesser General Public License for more details.
+--
+-- You should have received a copy of the GNU Lesser General Public
+-- License along with this library; if not, write to the Free Software
+-- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 local function get_item_description(name)
@@ -10,10 +26,10 @@ local function get_item_description(name)
 	end
 end
 
-function crafting.make_result_selector(player, type, size, context)
+function crafting.make_result_selector(player, type, level, size, context)
 	local page = context.crafting_page or 1
 
-	local full_recipes = crafting.get_all_for_player(player, type)
+	local full_recipes = crafting.get_all_for_player(player, type, level)
 	local recipes
 	if context.crafting_query then
 		recipes = {}
@@ -138,7 +154,7 @@ function crafting.make_result_selector(player, type, size, context)
 	return table.concat(formspec, "")
 end
 
-function crafting.result_select_on_receive_results(player, type, context, fields)
+function crafting.result_select_on_receive_results(player, type, level, context, fields)
 	if fields.prev then
 		context.crafting_page = (context.crafting_page or 1) - 1
 		return true
@@ -160,7 +176,7 @@ function crafting.result_select_on_receive_results(player, type, context, fields
 			if num then
 				local inv    = player:get_inventory()
 				local recipe = crafting.get_recipe(tonumber(num))
-				if not crafting.can_craft(player, type, recipe) then
+				if not crafting.can_craft(player, type, level, recipe) then
 					minetest.log("error", "[crafting] Player clicked a button they shouldn't have been able to")
 					return true
 				elseif crafting.perform_craft(inv, "main", recipe) then
@@ -173,18 +189,3 @@ function crafting.result_select_on_receive_results(player, type, context, fields
 		end
 	end
 end
-
-sfinv.override_page("sfinv:crafting", {
-	get = function(self, player, context)
-		local formspec = crafting.make_result_selector(player, "inv", { x = 8, y = 3 }, context)
-		formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
-				"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
-		return sfinv.make_formspec(player, context, formspec, true)
-	end,
-	on_player_receive_fields = function(self, player, context, fields)
-		if crafting.result_select_on_receive_results(player, "inv", context, fields) then
-			sfinv.set_player_inventory_formspec(player)
-		end
-		return true
-	end
-})

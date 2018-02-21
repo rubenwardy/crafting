@@ -31,6 +31,8 @@ function crafting.register_recipe(def)
 	assert(def.type,   "Type needed in recipe definition")
 	assert(def.items,  "Items needed in recipe definition")
 
+	def.level = def.level or 1
+
 	local tab = crafting.recipes[def.type]
 	assert(tab,        "Unknown craft type " .. def.type)
 
@@ -46,7 +48,7 @@ function crafting.get_recipe(id)
 	return crafting.recipes_by_id[id]
 end
 
-function crafting.get_all(type, item_hash, unlocked)
+function crafting.get_all(type, level, item_hash, unlocked)
 	assert(crafting.recipes[type], "No such craft type!")
 
 	local results = {}
@@ -54,7 +56,7 @@ function crafting.get_all(type, item_hash, unlocked)
 	for _, recipe in pairs(crafting.recipes[type]) do
 		local craftable = true
 
-		if recipe.always_known or unlocked[recipe.output] then
+		if recipe.level <= level and (recipe.always_known or unlocked[recipe.output]) then
 			-- Check all ingredients are available
 			local items = {}
 			for _, item in pairs(recipe.items) do
@@ -84,7 +86,7 @@ function crafting.get_all(type, item_hash, unlocked)
 	return results
 end
 
-function crafting.get_all_for_player(player, type)
+function crafting.get_all_for_player(player, type, level)
 	-- TODO: unlocked crafts
 	local unlocked = {}
 
@@ -106,14 +108,15 @@ function crafting.get_all_for_player(player, type)
 		end
 	end
 
-	return crafting.get_all(type, item_hash, unlocked)
+	return crafting.get_all(type, level, item_hash, unlocked)
 end
 
-function crafting.can_craft(player, type, recipe)
+function crafting.can_craft(player, type, level, recipe)
 	-- TODO: unlocked crafts
 	local unlocked = {}
 
-	return recipe.type == type and (recipe.always_known or unlocked[recipe.output])
+	return recipe.type == type and recipe.level <= level and
+		(recipe.always_known or unlocked[recipe.output])
 end
 
 local function give_all_to_player(inv, list)

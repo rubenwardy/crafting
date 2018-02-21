@@ -24,12 +24,13 @@ be used twice: `default:wood, group:wood`.
 		* `type`   - one of the registered types.
 		* `output` - the result of the craft, eg: `default:stone 3`.
 		* `items`  - A list of ingredients, eg: `{"stone", "wood 3"}`.
+		* `level`  - level of station required.
 		* `always_known` - If true, this recipe will never need to be unlocked.
 
 * crafting.get_recipe(id)
 	* Get recipe by ID
 
-* crafting.get_all_for_player(player, type)
+* crafting.get_all_for_player(player, type, level)
 	* Returns a list of results, each a table
 		* `items` - a key-value table, key being item name and value being a table:
 			* `have` - how many the player has
@@ -39,7 +40,7 @@ be used twice: `default:wood, group:wood`.
 	* `craftable` is a table of the items the player can craft with the items they have.
 	* `uncraftable` is a table of items the player knows about, but is missing items for.
 
-* crafting.get_all(type, item_hash, unlocked)
+* crafting.get_all(type, level, item_hash, unlocked)
 	* Returns same as above.
 	* `item_hash` - a table with keys being item names or group names (eg: `group:wood`)
 	                and the value being the number required.
@@ -56,13 +57,13 @@ be used twice: `default:wood, group:wood`.
 	* Will try to take items and put output in the `"main"` list in `inv`.
 	* Returns true on success.
 
-* crafting.make_result_selector(player, type, size, context)
+* crafting.make_result_selector(player, type, level, size, context)
 	* Generates a paginated form which a search box.
 	* `type`    - craft type.
 	* `size`    - how many slots to show on a page.
 	* `context` - server-side storage between show and submit, can be `{}`.
 		* `crafting_page` - page to show
 
-* crafting.result_select_on_receive_results(player, type, context, fields)
+* crafting.result_select_on_receive_results(player, type, level, context, fields)
 	* Handles form submissions for the result selector.
 	* Returns true if the formspec should be shown again.

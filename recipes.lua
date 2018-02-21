@@ -15,14 +15,34 @@
 -- License along with this library; if not, write to the Free Software
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+-- Craft type
 
 crafting.register_type("inv")
+
+sfinv.override_page("sfinv:crafting", {
+	get = function(self, player, context)
+		local formspec = crafting.make_result_selector(player, "inv", 1, { x = 8, y = 3 }, context)
+		formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
+				"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
+		return sfinv.make_formspec(player, context, formspec, true)
+	end,
+	on_player_receive_fields = function(self, player, context, fields)
+		if crafting.result_select_on_receive_results(player, "inv", 1, context, fields) then
+			sfinv.set_player_inventory_formspec(player)
+		end
+		return true
+	end
+})
+
+
+-- Recipes
 
 crafting.register_recipe({
 	type   = "inv",
 	output = "default:torch",
-	items  = { "default:stick", "default:coal" },
+	items  = { "default:stick", "default:coal_lump" },
 	always_known = true,
+	level  = 2,
 })
 
 crafting.register_recipe({
