@@ -234,7 +234,7 @@ function crafting.make_on_rightclick(type, level, inv_size)
 		end
 
 		if crafting.result_select_on_receive_results(player, type, level, context, fields) then
-			sfinv.set_player_inventory_formspec(player)
+			show(player, context)
 		end
 		return true
 	end)
