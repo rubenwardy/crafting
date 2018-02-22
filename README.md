@@ -49,6 +49,10 @@ be used twice: `default:wood, group:wood`.
 	                and the value being the number required.
 	* `unlocked`  - a list of outputs the player has unlocked.
 
+* crafting.set_item_hashes_from_list(inv, listname, item_hash)
+	* Iterates through the list and adds or updates entries in item_hash
+	  representing the number of items for each names and group.
+
 * crafting.find_required_items(inv, listname, recipe)
 	* Returns a list of stacks to take, or nil if the required items could not
 	  be found.
@@ -56,8 +60,8 @@ be used twice: `default:wood, group:wood`.
 * crafting.has_required_items(inv, listname, recipe)
 	* Returns true if the `"main"` list in `inv` contains the required items.
 
-* crafting.perform_craft(inv, listname, recipe)
-	* Will try to take items and put output in the `"main"` list in `inv`.
+* crafting.perform_craft(inv, listname, outlistname, recipe)
+	* Will try to take itemsfrom `listname` and put output in the `outlistname` list in `inv`.
 	* Returns true on success.
 
 * crafting.make_result_selector(player, type, level, size, context)
@@ -73,6 +77,10 @@ be used twice: `default:wood, group:wood`.
 
 * crafting.make_on_rightclick(type, level, inv_size)
 	* Returns a function to be used as on_rightclick for node work stations.
+
+* crafting.create_async_station(name, type, level, def_inactive, def_active)
+	* Makes a station which players put items into and then leave to craft.
+	* Registers two nodes - inactive and active versions of the station.
 
 ## Development
 

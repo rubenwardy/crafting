@@ -86,14 +86,8 @@ function crafting.get_all(type, level, item_hash, unlocked)
 	return results
 end
 
-function crafting.get_all_for_player(player, type, level)
-	-- TODO: unlocked crafts
-	local unlocked = {}
-
-	-- Get items hashed
-	local item_hash = {}
-	local inv = player:get_inventory()
-	for _, stack in pairs(inv:get_list("main")) do
+function crafting.set_item_hashes_from_list(inv, listname, item_hash)
+	for _, stack in pairs(inv:get_list(listname)) do
 		if not stack:is_empty() then
 			local itemname = stack:get_name()
 			item_hash[itemname] = (item_hash[itemname] or 0) + stack:get_count()
@@ -107,11 +101,20 @@ function crafting.get_all_for_player(player, type, level)
 			end
 		end
 	end
+end
+
+function crafting.get_all_for_player(player, type, level)
+	-- TODO: unlocked crafts
+	local unlocked = {}
+
+	-- Get items hashed
+	local item_hash = {}
+	crafting.set_item_hashes_from_list(player:get_inventory(), "main", item_hash)
 
 	return crafting.get_all(type, level, item_hash, unlocked)
 end
 
-function crafting.can_craft(player, type, level, recipe)
+function crafting.can_craft(name, type, level, recipe)
 	-- TODO: unlocked crafts
 	local unlocked = {}
 
@@ -175,7 +178,7 @@ function crafting.has_required_items(inv, listname, recipe)
 	return crafting.find_required_items(inv, listname, recipe) ~= nil
 end
 
-function crafting.perform_craft(inv, listname, recipe)
+function crafting.perform_craft(inv, listname, outlistname, recipe)
 	local items = crafting.find_required_items(inv, listname, recipe)
 	if not items then
 		return false
@@ -196,7 +199,7 @@ function crafting.perform_craft(inv, listname, recipe)
 	end
 
 	-- Add output
-	inv:add_item("main", recipe.output)
+	inv:add_item(outlistname, recipe.output)
 
 	return true
 end

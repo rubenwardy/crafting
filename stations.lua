@@ -36,3 +36,10 @@ minetest.register_node("crafting:work_bench", {
 	groups = { snappy = 1 },
 	on_rightclick = crafting.make_on_rightclick("inv", 2, { x = 8, y = 3 }),
 })
+
+crafting.create_async_station("crafting:furnace", "furnace", 1, {
+	description = "Furnace",
+}, {
+	description = "Furnace (active)",
+	groups = { not_in_creative_inventory = 1 },
+})

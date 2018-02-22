@@ -94,3 +94,14 @@ crafting.register_recipe({
 	items  = { "default:wood" },
 	always_known = true,
 })
+
+
+
+crafting.register_type("furnace")
+
+crafting.register_recipe({
+	type   = "furnace",
+	output = "default:steel_ingot",
+	items  = { "default:iron_lump" },
+	always_known = true,
+})

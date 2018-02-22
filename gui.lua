@@ -179,7 +179,7 @@ function crafting.result_select_on_receive_results(player, type, level, context,
 				if not crafting.can_craft(player, type, level, recipe) then
 					minetest.log("error", "[crafting] Player clicked a button they shouldn't have been able to")
 					return true
-				elseif crafting.perform_craft(inv, "main", recipe) then
+				elseif crafting.perform_craft(inv, "main", "main", recipe) then
 					return true -- crafted
 				else
 					minetest.chat_send_player(player:get_player_name(), "Missing required items!")
