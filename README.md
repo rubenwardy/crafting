@@ -73,3 +73,18 @@ be used twice: `default:wood, group:wood`.
 
 * crafting.make_on_rightclick(type, level, inv_size)
 	* Returns a function to be used as on_rightclick for node work stations.
+
+## Development
+
+
+**Installation:**
+
+```sh
+# Dependencies for linter and test framework
+sudo apt install luarocks
+sudo luarocks install luacheck
+sudo luarocks install busted
+
+# Set up git hook to disallow commiting when linter or tests fail
+./utils/setup.sh
+```
