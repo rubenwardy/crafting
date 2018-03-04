@@ -39,7 +39,36 @@ minetest.register_node("crafting:work_bench", {
 
 crafting.create_async_station("crafting:furnace", "furnace", 1, {
 	description = "Furnace",
+	tiles = {
+		"crafting_furnace_top.png", "crafting_furnace_bottom.png",
+		"crafting_furnace_side.png", "crafting_furnace_side.png",
+		"crafting_furnace_side.png", "crafting_furnace_front.png"
+	},
+	paramtype2 = "facedir",
+	groups = {cracky=2},
+	legacy_facedir_simple = true,
+	is_ground_content = false,
 }, {
 	description = "Furnace (active)",
-	groups = { not_in_creative_inventory = 1 },
+	tiles = {
+		"crafting_furnace_top.png", "crafting_furnace_bottom.png",
+		"crafting_furnace_side.png", "crafting_furnace_side.png",
+		"crafting_furnace_side.png",
+		{
+			image = "crafting_furnace_front_active.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 1.5
+			},
+		}
+	},
+	paramtype2 = "facedir",
+	light_source = 8,
+	drop = "crafting:furnace",
+	groups = {cracky=2, not_in_creative_inventory=1},
+	legacy_facedir_simple = true,
+	is_ground_content = false,
 })

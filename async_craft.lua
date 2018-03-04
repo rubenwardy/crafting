@@ -25,8 +25,9 @@ function default_def:start_craft(pos, recipe)
 	minetest.swap_node(pos, node)
 
 	local meta = minetest.get_meta(pos)
-	meta:set_int("recipe_idx", recipe.id)
+	meta:set_int("recipe_idx",     recipe.id)
 	meta:set_int("work_remaining", recipe.work or 10)
+	meta:set_int("work_total",     recipe.work or 10)
 
 	minetest.get_node_timer(pos):start(1.0)
 end
@@ -36,6 +37,9 @@ function default_def:make_inactive(pos)
 	node.name  = self.inactive_name
 	minetest.swap_node(pos, node)
 	minetest.get_node_timer(pos):start(1.0)
+
+	local meta = minetest.get_meta(pos)
+	meta:set_string("recipe_idx", nil)
 end
 
 function default_def.on_timer(pos)
@@ -95,6 +99,7 @@ function default_def.on_timer(pos)
 			end
 			check_for_craft(pos)
 		end
+		default_def.set_formspec(pos)
 	else
 		check_for_craft(pos)
 	end
@@ -102,16 +107,29 @@ function default_def.on_timer(pos)
 end
 
 function default_def.set_formspec(pos)
-	local formspec = "size[8,7.6]bgcolor[#080808BB;true]" ..
+	local meta = minetest.get_meta(pos)
+
+	local item_percent = 0
+	if meta:get_int("recipe_idx") > 0 then
+		local remaining = meta:get_int("work_remaining")
+		local total     = meta:get_int("work_total")
+		local done      = total - remaining
+		item_percent    = 100 * done / total
+	end
+	local fuel_percent = item_percent >= 0 and 0 or 100 -- TODO: fuel
+
+	local formspec = "size[8,8]bgcolor[#080808BB;true]" ..
 		default.gui_bg .. default.gui_bg_img .. default.gui_slots .. [[
 			list[context;input;1,0.3;2,1;]
-			list[context;fuel;1.5,2.1;2,1;]
-			list[context;main;5,0.75;2,2;]
-			list[current_player;main;0,3.7;8,1;]
-			list[current_player;main;0,4.85;8,3;8]
-		]]
+			list[context;fuel;1.5,2.5;2,1;]
+			list[context;main;5,0.93;2,2;]
+			list[current_player;main;0,4.1;8,1;]
+			list[current_player;main;0,5.25;8,3;8]
+			image[3.5,1.35;1,1;gui_furnace_arrow_bg.png^[lowpart:]] ..
+		(item_percent) .. ":gui_furnace_arrow_fg.png^[transformR270]" ..
+		"image[1.5,1.35;1,1;default_furnace_fire_bg.png^[lowpart:"..
+		(100-fuel_percent)..":default_furnace_fire_fg.png]"
 
-	local meta = minetest.get_meta(pos)
 	meta:set_string("formspec", formspec)
 	return formspec
 end
