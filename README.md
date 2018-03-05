@@ -8,6 +8,17 @@ License: LGPLv2.1+
 
 ![Screenshot](screenshot.png)
 
+## Image Licenses
+
+rubenwardy (CC BY-SA 3.0):
+  crafting_slot_*.png
+
+Neuromancer (CC BY-SA 3.0):
+  crafting_furnace_*.png
+
+BlockMen (CC BY-SA 3.0):
+  gui_*.png
+
 ## Limitations
 
 Any recipes must be designed such that any particular item can only be used
