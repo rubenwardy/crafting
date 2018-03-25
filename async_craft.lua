@@ -108,7 +108,7 @@ function default_def.set_formspec(pos)
 	local fuel_percent = item_percent >= 0 and 0 or 100 -- TODO: fuel
 
 	local formspec = [[
-			size[8,8]bgcolor[#080808BB;true]
+			size[8,8]
 			list[context;input;1,0.3;2,1;]
 			list[context;fuel;1.5,2.5;2,1;]
 			list[context;main;5,0.93;2,2;]
