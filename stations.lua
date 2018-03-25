@@ -15,21 +15,25 @@
 -- License along with this library; if not, write to the Free Software
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+crafting.register_type("inv")
+crafting.register_type("furnace")
 
-sfinv.override_page("sfinv:crafting", {
-	get = function(self, player, context)
-		local formspec = crafting.make_result_selector(player, "inv", 1, { x = 8, y = 3 }, context)
-		formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
-				"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
-		return sfinv.make_formspec(player, context, formspec, true)
-	end,
-	on_player_receive_fields = function(self, player, context, fields)
-		if crafting.result_select_on_receive_results(player, "inv", 1, context, fields) then
-			sfinv.set_player_inventory_formspec(player)
+if minetest.global_exists("sfinv") then
+	sfinv.override_page("sfinv:crafting", {
+		get = function(self, player, context)
+			local formspec = crafting.make_result_selector(player, "inv", 1, { x = 8, y = 3 }, context)
+			formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
+					"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
+			return sfinv.make_formspec(player, context, formspec, true)
+		end,
+		on_player_receive_fields = function(self, player, context, fields)
+			if crafting.result_select_on_receive_results(player, "inv", 1, context, fields) then
+				sfinv.set_player_inventory_formspec(player)
+			end
+			return true
 		end
-		return true
-	end
-})
+	})
+end
 
 minetest.register_node("crafting:work_bench", {
 	description = "Work Bench",

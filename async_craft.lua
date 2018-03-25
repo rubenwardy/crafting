@@ -118,8 +118,8 @@ function default_def.set_formspec(pos)
 	end
 	local fuel_percent = item_percent >= 0 and 0 or 100 -- TODO: fuel
 
-	local formspec = "size[8,8]bgcolor[#080808BB;true]" ..
-		default.gui_bg .. default.gui_bg_img .. default.gui_slots .. [[
+	local formspec = [[
+			size[8,8]bgcolor[#080808BB;true]
 			list[context;input;1,0.3;2,1;]
 			list[context;fuel;1.5,2.5;2,1;]
 			list[context;main;5,0.93;2,2;]
@@ -127,8 +127,8 @@ function default_def.set_formspec(pos)
 			list[current_player;main;0,5.25;8,3;8]
 			image[3.5,1.35;1,1;gui_furnace_arrow_bg.png^[lowpart:]] ..
 		(item_percent) .. ":gui_furnace_arrow_fg.png^[transformR270]" ..
-		"image[1.5,1.35;1,1;default_furnace_fire_bg.png^[lowpart:"..
-		(100-fuel_percent)..":default_furnace_fire_fg.png]"
+		"image[1.5,1.35;1,1;crafting_furnace_fire_bg.png^[lowpart:"..
+		(100-fuel_percent)..":crafting_furnace_fire_fg.png]"
 
 	meta:set_string("formspec", formspec)
 	return formspec

@@ -215,11 +215,11 @@ function crafting.make_on_rightclick(type, level, inv_size)
 
 	local function show(player, context)
 		local formspec = crafting.make_result_selector(player, type, level, inv_size, context)
-		formspec = "size[" .. inv_size.x  .. "," .. (inv_size.y + 5.6) .. "]bgcolor[#080808BB;true]" .. default.gui_bg ..
-			default.gui_bg_img .. formspec .. default.gui_slots .. [[
+		formspec = "size[" .. inv_size.x  .. "," .. (inv_size.y + 5.6) .. [[
+				bgcolor[#080808BB;true]
 				list[current_player;main;0,4.7;8,1;]
 				list[current_player;main;0,5.85;8,3;8]
-			]]
+			]] .. formspec
 		minetest.show_formspec(player:get_player_name(), formname, formspec)
 	end
 

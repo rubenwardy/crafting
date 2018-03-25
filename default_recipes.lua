@@ -15,8 +15,6 @@
 -- License along with this library; if not, write to the Free Software
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-crafting.register_type("inv")
-
 crafting.register_recipe({
 	type   = "inv",
 	output = "default:torch",
@@ -94,10 +92,6 @@ crafting.register_recipe({
 	items  = { "default:wood" },
 	always_known = true,
 })
-
-
-
-crafting.register_type("furnace")
 
 crafting.register_recipe({
 	type   = "furnace",
