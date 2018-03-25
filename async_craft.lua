@@ -43,20 +43,15 @@ function default_def:make_inactive(pos)
 end
 
 function default_def.on_timer(pos)
-	minetest.chat_send_all("Async station timer!")
-
 	local meta        = minetest.get_meta(pos)
 	local player_name = meta:get_string("user")
 	local inv         = meta:get_inventory()
 	local def         = minetest.registered_items[minetest.get_node(pos).name]
 	if player_name == "" or not def then
-		minetest.chat_send_all(" - no player or dev")
 		return
 	end
 
 	local function check_for_craft()
-		minetest.chat_send_all(" - looking for something to craft")
-
 		local item_hash = {}
 		crafting.set_item_hashes_from_list(inv, "input", item_hash)
 		local recipes = crafting.get_all(def.craft_type, def.craft_level, item_hash, {})
@@ -72,24 +67,18 @@ function default_def.on_timer(pos)
 
 		-- If found, start crafting
 		if best_recipe then
-			minetest.chat_send_all(" - found recipe for " .. best_recipe.recipe.output)
 			def:start_craft(pos, best_recipe.recipe)
 		elseif def.is_active then
-			minetest.chat_send_all(" - no valid recipes found")
 			def:make_inactive(pos)
 		end
 	end
 
 	if def.is_active then
-		minetest.chat_send_all(" - is active")
 		local work_remaining = meta:get_int("work_remaining")
 		if work_remaining > 0 then
 			meta:set_int("work_remaining", work_remaining - 1)
-			minetest.chat_send_all(" - work_remaining: " .. (work_remaining - 1))
 			minetest.get_node_timer(pos):start(1.0)
 		else
-			minetest.chat_send_all(" - crafting!")
-
 			local idx    = meta:get_int("recipe_idx")
 			local recipe = crafting.get_recipe(idx)
 			if not crafting.perform_craft(inv, "input", "main", recipe) then
