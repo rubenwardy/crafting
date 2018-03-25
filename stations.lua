@@ -19,8 +19,13 @@ crafting.register_type("inv")
 crafting.register_type("furnace")
 
 if minetest.global_exists("sfinv") then
+	local player_inv_hashes = {}
+
 	sfinv.override_page("sfinv:crafting", {
 		get = function(self, player, context)
+			player_inv_hashes[player:get_player_name()] =
+					crafting.calc_inventory_list_hash(player:get_inventory(), "main")
+
 			local formspec = crafting.make_result_selector(player, "inv", 1, { x = 8, y = 3 }, context)
 			formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
 					"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
@@ -33,6 +38,21 @@ if minetest.global_exists("sfinv") then
 			return true
 		end
 	})
+
+	local function check_for_changes()
+		for _, player in pairs(minetest.get_connected_players()) do
+			if sfinv.get_or_create_context(player).page == "sfinv:crafting" then
+				local hash = crafting.calc_inventory_list_hash(player:get_inventory(), "main")
+				local old_hash = player_inv_hashes[player:get_player_name()]
+				if hash ~= old_hash then
+					sfinv.set_page(player, "sfinv:crafting")
+				end
+			end
+		end
+
+		minetest.after(1, check_for_changes)
+	end
+	check_for_changes()
 end
 
 minetest.register_node("crafting:work_bench", {

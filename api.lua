@@ -203,3 +203,17 @@ function crafting.perform_craft(inv, listname, outlistname, recipe)
 
 	return true
 end
+
+local function to_hex(str)
+    return (str:gsub('.', function (c)
+        return string.format('%02X', string.byte(c))
+    end))
+end
+
+function crafting.calc_inventory_list_hash(inv, listname)
+	local str = ""
+	for _, stack in pairs(inv:get_list(listname)) do
+		str = str .. stack:get_name() .. stack:get_count()
+	end
+	return minetest.sha1(to_hex(str))
+end

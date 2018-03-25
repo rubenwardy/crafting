@@ -22,5 +22,5 @@ dofile(minetest.get_modpath("crafting") .. "/gui.lua")
 dofile(minetest.get_modpath("crafting") .. "/stations.lua")
 
 if minetest.global_exists("default") then
-	dofile(minetest.get_modpath("crafting") .. "/recipes.lua")
+	dofile(minetest.get_modpath("crafting") .. "/default_recipes.lua")
 end
