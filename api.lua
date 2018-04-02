@@ -93,7 +93,7 @@ function crafting.set_item_hashes_from_list(inv, listname, item_hash)
 			item_hash[itemname] = (item_hash[itemname] or 0) + stack:get_count()
 
 			local def = minetest.registered_items[itemname]
-			if def.groups then
+			if def and def.groups then
 				for groupname, _ in pairs(def.groups) do
 					local group = "group:" .. groupname
 					item_hash[group] = (item_hash[group] or 0) + stack:get_count()
