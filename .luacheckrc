@@ -10,6 +10,7 @@ read_globals = {
 	string = {fields = {"split"}},
 	table = {fields = {"copy", "getn"}},
 	"vector", "default", "sfinv",
+	"ItemStack",
 
 
 	-- Testing

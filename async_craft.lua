@@ -30,6 +30,7 @@ function default_def:start_craft(pos, recipe)
 	meta:set_int("work_total",     recipe.work or 10)
 
 	minetest.get_node_timer(pos):start(1.0)
+	default_def.set_formspec(pos)
 end
 
 function default_def:make_inactive(pos)
@@ -40,6 +41,16 @@ function default_def:make_inactive(pos)
 
 	local meta = minetest.get_meta(pos)
 	meta:set_string("recipe_idx", nil)
+	default_def.set_formspec(pos)
+end
+
+local function get_fuel_time(name)
+	local fuel, _ = minetest.get_craft_result({
+		method = "fuel",
+		width = 1,
+		items = { ItemStack(name) },
+	})
+	return fuel.time
 end
 
 function default_def.on_timer(pos)
@@ -51,6 +62,8 @@ function default_def.on_timer(pos)
 		return
 	end
 
+	-- Look and start a craft if possible
+	-- Called after finishing a craft or every timer call when no craft
 	local function check_for_craft()
 		local item_hash = {}
 		crafting.set_item_hashes_from_list(inv, "input", item_hash)
@@ -65,6 +78,20 @@ function default_def.on_timer(pos)
 			end
 		end
 
+		-- Check we have enough fuel
+		if best_recipe then
+			local fuel_remaining = meta:get_int("fuel_remaining") or 0
+			local fuel_possible = fuel_remaining
+			local fuel_stack = inv:get_stack("fuel", 1)
+			if not fuel_stack:is_empty() then
+				fuel_possible = fuel_possible +
+						fuel_stack:get_count() * get_fuel_time(fuel_stack:get_name())
+			end
+			if fuel_possible < (best_recipe.work or 10) then
+				best_recipe = nil
+			end
+		end
+
 		-- If found, start crafting
 		if best_recipe then
 			def:start_craft(pos, best_recipe.recipe)
@@ -73,26 +100,59 @@ function default_def.on_timer(pos)
 		end
 	end
 
-	if def.is_active then
-		local work_remaining = meta:get_int("work_remaining")
-		if work_remaining > 0 then
-			meta:set_int("work_remaining", work_remaining - 1)
-			minetest.get_node_timer(pos):start(1.0)
-		else
-			local idx    = meta:get_int("recipe_idx")
-			local recipe = crafting.get_recipe(idx)
-			if not crafting.perform_craft(inv, "input", "main", recipe) then
-				minetest.log("error", "Async station " ..
-					def.name .. " at " .. minetest.pos_to_string(pos) ..
-					" was unable to finish craft due to missing inputs")
-			end
-			check_for_craft(pos)
-		end
+	-- Consume fuel even when the crafter is inactive
+	local fuel_remaining = meta:get_int("fuel_remaining") or 0
+	if fuel_remaining > 0 then
+		meta:set_int("fuel_remaining", fuel_remaining - 1)
 		default_def.set_formspec(pos)
-	else
-		check_for_craft(pos)
 	end
 
+	-- Try to find craft if none active
+	if not def.is_active then
+		check_for_craft(pos)
+		return
+	end
+
+	-- Check craft complete, produce item
+	local work_remaining = meta:get_int("work_remaining")
+	if work_remaining <= 0 then
+		local idx    = meta:get_int("recipe_idx")
+		local recipe = crafting.get_recipe(idx)
+		if not crafting.perform_craft(inv, "input", "main", recipe) then
+			minetest.log("error", "Async station " ..
+				def.name .. " at " .. minetest.pos_to_string(pos) ..
+				" was unable to finish craft due to missing inputs")
+		end
+		check_for_craft(pos)
+		return
+	end
+
+	-- Refill fuel if we've run out, or stop
+	if fuel_remaining <= 0 then
+		local stack = inv:get_stack("fuel", 1)
+		if stack:is_empty() then
+			def:make_inactive(pos)
+			default_def.set_formspec(pos)
+			return
+		end
+
+		local total = get_fuel_time(stack:get_name())
+		if total <= 0 then
+			def:make_inactive(pos)
+			default_def.set_formspec(pos)
+			return
+		end
+
+		stack:take_item()
+		inv:set_stack("fuel", 1, stack)
+		meta:set_int("fuel_remaining", total)
+		meta:set_int("fuel_total", total)
+	end
+
+	-- Do work
+	meta:set_int("work_remaining", work_remaining - 1)
+	minetest.get_node_timer(pos):start(1.0)
+	default_def.set_formspec(pos)
 end
 
 function default_def.set_formspec(pos)
@@ -102,10 +162,15 @@ function default_def.set_formspec(pos)
 	if meta:get_int("recipe_idx") > 0 then
 		local remaining = meta:get_int("work_remaining")
 		local total     = meta:get_int("work_total")
-		local done      = total - remaining
-		item_percent    = 100 * done / total
+		item_percent    = 100 * (1 - remaining / total)
 	end
-	local fuel_percent = item_percent >= 0 and 0 or 100 -- TODO: fuel
+
+	local fuel_remaining = meta:get_int("fuel_remaining")
+	local fuel_total     = meta:get_int("fuel_total")
+	if fuel_total == 0 then
+		fuel_total = 1
+	end
+	local fuel_percent = 100 * fuel_remaining / fuel_total
 
 	local formspec = [[
 			size[8,8]
@@ -115,9 +180,9 @@ function default_def.set_formspec(pos)
 			list[current_player;main;0,4.1;8,1;]
 			list[current_player;main;0,5.25;8,3;8]
 			image[3.5,1.35;1,1;gui_furnace_arrow_bg.png^[lowpart:]] ..
-		(item_percent) .. ":gui_furnace_arrow_fg.png^[transformR270]" ..
+		item_percent .. ":gui_furnace_arrow_fg.png^[transformR270]" ..
 		"image[1.5,1.35;1,1;crafting_furnace_fire_bg.png^[lowpart:"..
-		(100-fuel_percent)..":crafting_furnace_fire_fg.png]"
+		fuel_percent ..":crafting_furnace_fire_fg.png]"
 
 	meta:set_string("formspec", formspec)
 	return formspec
