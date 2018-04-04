@@ -56,6 +56,7 @@ end
 function default_def.on_timer(pos)
 	local meta        = minetest.get_meta(pos)
 	local player_name = meta:get_string("user")
+	local player      = minetest.get_player_by_name(player_name)
 	local inv         = meta:get_inventory()
 	local def         = minetest.registered_items[minetest.get_node(pos).name]
 	if player_name == "" or not def then
@@ -67,7 +68,9 @@ function default_def.on_timer(pos)
 	local function check_for_craft()
 		local item_hash = {}
 		crafting.set_item_hashes_from_list(inv, "input", item_hash)
-		local recipes = crafting.get_all(def.craft_type, def.craft_level, item_hash, {})
+
+		local unlocked = crafting.get_unlocked(player)
+		local recipes = crafting.get_all(def.craft_type, def.craft_level, item_hash, unlocked)
 		-- TODO: unlocked crafts
 
 		-- Find recipe with most inputs (ie: prioritise alloys)
@@ -118,7 +121,7 @@ function default_def.on_timer(pos)
 	if work_remaining <= 0 then
 		local idx    = meta:get_int("recipe_idx")
 		local recipe = crafting.get_recipe(idx)
-		if not crafting.perform_craft(inv, "input", "main", recipe) then
+		if not crafting.perform_craft(player_name, inv, "input", "main", recipe) then
 			minetest.log("error", "Async station " ..
 				def.name .. " at " .. minetest.pos_to_string(pos) ..
 				" was unable to finish craft due to missing inputs")

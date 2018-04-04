@@ -24,3 +24,19 @@ dofile(minetest.get_modpath("crafting") .. "/stations.lua")
 if minetest.global_exists("default") then
 	dofile(minetest.get_modpath("crafting") .. "/default_recipes.lua")
 end
+
+if minetest.global_exists("awards") then
+	awards.register_on_unlock(function(name, award)
+		if award.unlocks_crafts then
+			local player = minetest.get_player_by_name(name)
+			crafting.unlock(player, award.unlocks_crafts)
+		end
+	end)
+
+	crafting.register_on_craft(function(name, recipe)
+		local player = minetest.get_player_by_name(name)
+		if player then
+			awards.notify_craft(player, recipe.output, recipe.output_n or 1)
+		end
+	end)
+end

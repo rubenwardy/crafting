@@ -19,6 +19,7 @@
 crafting = {
 	recipes = {},
 	recipes_by_id = {},
+	registered_on_crafts = {},
 }
 
 function crafting.register_type(name)
@@ -42,6 +43,46 @@ function crafting.register_recipe(def)
 	tab[#tab + 1] = def
 
 	return def.id
+end
+
+local unlocked_cache = {}
+function crafting.get_unlocked(player)
+	if not player then
+		return {}
+	end
+
+	local name = player:get_player_name()
+	local retval = unlocked_cache[name]
+	if not retval then
+		retval = minetest.parse_json(player:get_attribute("crafting:unlocked")
+				or "{}")
+		unlocked_cache[name] = retval
+	end
+
+	return retval
+end
+
+if minetest then
+	minetest.register_on_leaveplayer(function(player)
+		unlocked_cache[player:get_player_name()] = nil
+	end)
+end
+
+function crafting.unlock(player, output)
+	local unlocked = crafting.get_unlocked(player)
+
+	if type(output) == "table" then
+		for i=1, #output do
+			unlocked[output[i]] = true
+			minetest.chat_send_player(player:get_player_name(), "You've unlocked " .. output[i])
+		end
+	else
+		unlocked[output] = true
+		minetest.chat_send_player(player:get_player_name(), "You've unlocked " .. output)
+	end
+
+	unlocked_cache[player:get_player_name()] = unlocked
+	player:set_attribute("crafting:unlocked", minetest.write_json(unlocked))
 end
 
 function crafting.get_recipe(id)
@@ -104,8 +145,7 @@ function crafting.set_item_hashes_from_list(inv, listname, item_hash)
 end
 
 function crafting.get_all_for_player(player, type, level)
-	-- TODO: unlocked crafts
-	local unlocked = {}
+	local unlocked = crafting.get_unlocked(player)
 
 	-- Get items hashed
 	local item_hash = {}
@@ -115,8 +155,7 @@ function crafting.get_all_for_player(player, type, level)
 end
 
 function crafting.can_craft(name, type, level, recipe)
-	-- TODO: unlocked crafts
-	local unlocked = {}
+	local unlocked = crafting.get_unlocked(minetest.get_player_by_name(name))
 
 	return recipe.type == type and recipe.level <= level and
 		(recipe.always_known or unlocked[recipe.output])
@@ -178,7 +217,11 @@ function crafting.has_required_items(inv, listname, recipe)
 	return crafting.find_required_items(inv, listname, recipe) ~= nil
 end
 
-function crafting.perform_craft(inv, listname, outlistname, recipe)
+function crafting.register_on_craft(func)
+	table.insert(crafting.registered_on_crafts, func)
+end
+
+function crafting.perform_craft(name, inv, listname, outlistname, recipe)
 	local items = crafting.find_required_items(inv, listname, recipe)
 	if not items then
 		return false
@@ -196,6 +239,10 @@ function crafting.perform_craft(inv, listname, outlistname, recipe)
 			give_all_to_player(inv, taken)
 			return false
 		end
+	end
+
+	for i=1, #crafting.registered_on_crafts do
+		crafting.registered_on_crafts[i](name, recipe)
 	end
 
 	-- Add output

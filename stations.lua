@@ -21,14 +21,26 @@ crafting.register_type("furnace")
 if minetest.global_exists("sfinv") then
 	local player_inv_hashes = {}
 
+	local trash = minetest.create_detached_inventory("crafting_trash", {
+		-- Allow the stack to be placed and remove it in on_put()
+		-- This allows the creative inventory to restore the stack
+		allow_put = function(inv, listname, index, stack, player)
+			return stack:get_count()
+		end,
+		on_put = function(inv, listname)
+			inv:set_list(listname, {})
+		end,
+	})
+	trash:set_size("main", 1)
+
 	sfinv.override_page("sfinv:crafting", {
 		get = function(self, player, context)
 			player_inv_hashes[player:get_player_name()] =
 					crafting.calc_inventory_list_hash(player:get_inventory(), "main")
 
 			local formspec = crafting.make_result_selector(player, "inv", 1, { x = 8, y = 3 }, context)
-			formspec = formspec .. "list[detached:creative_trash;main;0,3.4;1,1;]" ..
-					"image[0.05,3.5;0.8,0.8;creative_trash_icon.png]"
+			formspec = formspec .. "list[detached:crafting_trash;main;0,3.4;1,1;]" ..
+					"image[0.05,3.5;0.8,0.8;crafting_trash_icon.png]"
 			return sfinv.make_formspec(player, context, formspec, true)
 		end,
 		on_player_receive_fields = function(self, player, context, fields)

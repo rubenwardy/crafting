@@ -19,6 +19,9 @@ Neuromancer (CC BY-SA 3.0):
 BlockMen (CC BY-SA 3.0):
   gui_*.png
 
+paramat (CC BY-SA 3.0)
+  creative_trash_icon.png  (derived from a texture by kilbith, same license)
+
 ## Limitations
 
 Any recipes must be designed such that any particular item can only be used
@@ -71,7 +74,7 @@ be used twice: `default:wood, group:wood`.
 * crafting.has_required_items(inv, listname, recipe)
 	* Returns true if the `"main"` list in `inv` contains the required items.
 
-* crafting.perform_craft(inv, listname, outlistname, recipe)
+* crafting.perform_craft(name, inv, listname, outlistname, recipe)
 	* Will try to take itemsfrom `listname` and put output in the `outlistname` list in `inv`.
 	* Returns true on success.
 
