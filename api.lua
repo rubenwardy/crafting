@@ -46,12 +46,13 @@ function crafting.register_recipe(def)
 end
 
 local unlocked_cache = {}
-function crafting.get_unlocked(player)
+function crafting.get_unlocked(name)
+	local player = minetest.get_player_by_name(name)
 	if not player then
+		minetest.log("warning", "Crafting doesn't support getting unlocks for offline players")
 		return {}
 	end
 
-	local name = player:get_player_name()
 	local retval = unlocked_cache[name]
 	if not retval then
 		retval = minetest.parse_json(player:get_attribute("crafting:unlocked")
@@ -68,20 +69,26 @@ if minetest then
 	end)
 end
 
-function crafting.unlock(player, output)
-	local unlocked = crafting.get_unlocked(player)
+function crafting.unlock(name, output)
+	local player = minetest.get_player_by_name(name)
+	if not player then
+		minetest.log("warning", "Crafting doesn't support setting unlocks for offline players")
+		return {}
+	end
+
+	local unlocked = crafting.get_unlocked(name)
 
 	if type(output) == "table" then
 		for i=1, #output do
 			unlocked[output[i]] = true
-			minetest.chat_send_player(player:get_player_name(), "You've unlocked " .. output[i])
+			minetest.chat_send_player(name, "You've unlocked " .. output[i])
 		end
 	else
 		unlocked[output] = true
-		minetest.chat_send_player(player:get_player_name(), "You've unlocked " .. output)
+		minetest.chat_send_player(name, "You've unlocked " .. output)
 	end
 
-	unlocked_cache[player:get_player_name()] = unlocked
+	unlocked_cache[name] = unlocked
 	player:set_attribute("crafting:unlocked", minetest.write_json(unlocked))
 end
 
@@ -145,7 +152,7 @@ function crafting.set_item_hashes_from_list(inv, listname, item_hash)
 end
 
 function crafting.get_all_for_player(player, type, level)
-	local unlocked = crafting.get_unlocked(player)
+	local unlocked = crafting.get_unlocked(player:get_player_name())
 
 	-- Get items hashed
 	local item_hash = {}
@@ -155,7 +162,7 @@ function crafting.get_all_for_player(player, type, level)
 end
 
 function crafting.can_craft(name, type, level, recipe)
-	local unlocked = crafting.get_unlocked(minetest.get_player_by_name(name))
+	local unlocked = crafting.get_unlocked(name)
 
 	return recipe.type == type and recipe.level <= level and
 		(recipe.always_known or unlocked[recipe.output])

@@ -47,6 +47,14 @@ be used twice: `default:wood, group:wood`.
 * crafting.get_recipe(id)
 	* Get recipe by ID
 
+* crafting.get_unlocked(name)
+	* `name` is the player's name
+	* Returns a dictionary of recipe output to boolean.
+
+* crafting.unlock(name, v)
+	* `name` is the player's name
+	* `v` is a single output or list of outputs
+
 * crafting.get_all_for_player(player, type, level)
 	* Returns a list of results, each a table
 		* `items` - a key-value table, key being item name and value being a table:

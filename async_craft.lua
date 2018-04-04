@@ -56,7 +56,6 @@ end
 function default_def.on_timer(pos)
 	local meta        = minetest.get_meta(pos)
 	local player_name = meta:get_string("user")
-	local player      = minetest.get_player_by_name(player_name)
 	local inv         = meta:get_inventory()
 	local def         = minetest.registered_items[minetest.get_node(pos).name]
 	if player_name == "" or not def then
@@ -69,7 +68,7 @@ function default_def.on_timer(pos)
 		local item_hash = {}
 		crafting.set_item_hashes_from_list(inv, "input", item_hash)
 
-		local unlocked = crafting.get_unlocked(player)
+		local unlocked = crafting.get_unlocked(player_name)
 		local recipes = crafting.get_all(def.craft_type, def.craft_level, item_hash, unlocked)
 		-- TODO: unlocked crafts
 

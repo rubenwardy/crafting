@@ -28,8 +28,7 @@ end
 if minetest.global_exists("awards") then
 	awards.register_on_unlock(function(name, award)
 		if award.unlocks_crafts then
-			local player = minetest.get_player_by_name(name)
-			crafting.unlock(player, award.unlocks_crafts)
+			crafting.unlock(name, award.unlocks_crafts)
 		end
 	end)
 
