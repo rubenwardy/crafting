@@ -83,6 +83,16 @@ function crafting.make_result_selector(player, type, level, size, context)
 	local x = 0
 	local y = 0
 	local y_offset = 0.2
+	if context.crafting_query then
+		minetest.log("warning", "Crafting query '" .. context.crafting_query ..
+		                        "' visible recipes " .. #recipes ..
+								" start_i ".. start_i ..
+								" NPP " .. num_per_page)
+	else
+		minetest.log("warning", "Visible recipes " .. #recipes ..
+								" start_i " .. start_i ..
+								" NPP " .. num_per_page)
+	end
 	for i = start_i, math.min(#recipes, start_i * num_per_page)  do
 		local result = recipes[i]
 		local recipe = result.recipe
