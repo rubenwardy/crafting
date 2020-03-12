@@ -64,6 +64,8 @@ function crafting.make_result_selector(player, type, level, size, context)
 	formspec[#formspec + 1] = tostring(size.y)
 	formspec[#formspec + 1] = "]"
 
+	formspec[#formspec + 1] = "style_type[item_image_button;border=false]"
+
 	formspec[#formspec + 1] = "field_close_on_enter[query;false]"
 	formspec[#formspec + 1] = "field[-4.75,0.81;3,0.8;query;;"
 	formspec[#formspec + 1] = context.crafting_query
