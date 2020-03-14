@@ -69,6 +69,25 @@ if minetest then
 	end)
 end
 
+
+function crafting.lock_all(name, output)
+	local player = minetest.get_player_by_name(name)
+	if not player then
+		minetest.log("warning", "Crafting doesn't support setting unlocks for offline players")
+		return {}
+	end
+
+	local unlocked = crafting.get_unlocked(name)
+
+	for key, _ in pairs(unlocked) do
+		unlocked[key] = nil
+	end
+
+	unlocked_cache[name] = unlocked
+
+	player:get_meta():set_string("crafting:unlocked", minetest.write_json(unlocked))
+end
+
 function crafting.unlock(name, output)
 	local player = minetest.get_player_by_name(name)
 	if not player then
@@ -89,7 +108,7 @@ function crafting.unlock(name, output)
 	end
 
 	unlocked_cache[name] = unlocked
-	player:set_attribute("crafting:unlocked", minetest.write_json(unlocked))
+	player:get_meta():set_string("crafting:unlocked", minetest.write_json(unlocked))
 end
 
 function crafting.get_recipe(id)
