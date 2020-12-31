@@ -1,9 +1,9 @@
-# crafting
+# Crafting
 
 Adds semi-realistic crafting with unlockable recipes to Minetest, and removes
 the craft grid.
 
-By rubenwardy  
+Created by rubenwardy.  
 License: LGPLv2.1+
 
 ![Screenshot](screenshot.png)
