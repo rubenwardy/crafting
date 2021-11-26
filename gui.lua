@@ -48,7 +48,12 @@ function crafting.make_result_selector(player, type, level, size, context)
 
 
 	local num_per_page = size.x * size.y
-	local max_pages = math.floor(0.999 + #recipes / num_per_page)
+
+	local max_pages = 1
+	if #recipes > 0 then
+		max_pages = math.floor((#recipes + num_per_page - 1) / num_per_page)
+	end
+
 	if page > max_pages or page < 1 then
 		page = ((page - 1) % max_pages) + 1
 		context.crafting_page = page
