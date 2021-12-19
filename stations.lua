@@ -18,6 +18,8 @@
 crafting.register_type("inv")
 crafting.register_type("furnace")
 
+local S = crafting.S
+
 if minetest.global_exists("sfinv") then
 	local player_inv_hashes = {}
 
@@ -68,13 +70,13 @@ if minetest.global_exists("sfinv") then
 end
 
 minetest.register_node("crafting:work_bench", {
-	description = "Work Bench",
+	description = S("Work Bench"),
 	groups = { snappy = 1 },
 	on_rightclick = crafting.make_on_rightclick("inv", 2, { x = 8, y = 3 }),
 })
 
 crafting.create_async_station("crafting:furnace", "furnace", 1, {
-	description = "Furnace",
+	description = minetest.translate("default","Furnace"),
 	tiles = {
 		"crafting_furnace_top.png", "crafting_furnace_bottom.png",
 		"crafting_furnace_side.png", "crafting_furnace_side.png",
@@ -85,7 +87,7 @@ crafting.create_async_station("crafting:furnace", "furnace", 1, {
 	legacy_facedir_simple = true,
 	is_ground_content = false,
 }, {
-	description = "Furnace (active)",
+	description = minetest.translate("default","Furnace") .. S("(active)"),
 	tiles = {
 		"crafting_furnace_top.png", "crafting_furnace_bottom.png",
 		"crafting_furnace_side.png", "crafting_furnace_side.png",
