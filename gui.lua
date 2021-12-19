@@ -15,6 +15,7 @@
 -- License along with this library; if not, write to the Free Software
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+local S = crafting.S
 
 local function get_item_description(name)
 	if name:sub(1, 6) == "group:" then
@@ -82,9 +83,14 @@ function crafting.make_result_selector(player, type, level, size, context)
 
 
 	formspec[#formspec + 1] = "label[0,-0.25;"
+    --[[
 	formspec[#formspec + 1] = minetest.formspec_escape("Page: " ..
 			page .. "/" .. max_pages ..
 			" | Unlocked: " .. #full_recipes .. " / " .. #crafting.recipes[type])
+    ]]
+    formspec[#formspec + 1] = minetest.formspec_escape(S("Page: @1/@2",page,max_pages))
+    formspec[#formspec + 1] = minetest.formspec_escape(" | ")
+    formspec[#formspec + 1] = minetest.formspec_escape(S("Unlocked: @1/@2",#full_recipes,#crafting.recipes[type]))
 	formspec[#formspec + 1] = "]"
 
 	local x = 0
@@ -190,7 +196,7 @@ function crafting.result_select_on_receive_results(player, type, level, context,
 				elseif crafting.perform_craft(name, inv, "main", "main", recipe) then
 					return true -- crafted
 				else
-					minetest.chat_send_player(name, "Missing required items!")
+					minetest.chat_send_player(name, S("Missing required items!"))
 					return false
 				end
 			end

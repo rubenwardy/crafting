@@ -1,0 +1,8 @@
+# textdomain: crafting
+You've unlocked @1=
+No room in inventory!=
+Page: @1/@2=
+Unlocked: @1/@2=
+Missing required items!=
+Work Bench=
+(active)=

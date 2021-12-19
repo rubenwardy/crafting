@@ -20,7 +20,9 @@ crafting = {
 	recipes = {},
 	recipes_by_id = {},
 	registered_on_crafts = {},
+    S = minetest.get_translator(minetest.get_current_modname())
 }
+local S = crafting.S
 
 function crafting.register_type(name)
 	crafting.recipes[name] = {}
@@ -109,11 +111,11 @@ function crafting.unlock(name, output)
 	if type(output) == "table" then
 		for i=1, #output do
 			unlocked[output[i]] = true
-			minetest.chat_send_player(name, "You've unlocked " .. output[i])
+			minetest.chat_send_player(name, S("You've unlocked @1",output[i]))
 		end
 	else
 		unlocked[output] = true
-		minetest.chat_send_player(name, "You've unlocked " .. output)
+		minetest.chat_send_player(name, S("You've unlocked @1",output))
 	end
 
 	unlocked_cache[name] = unlocked
@@ -285,7 +287,7 @@ function crafting.perform_craft(name, inv, listname, outlistname, recipe)
 		inv:add_item(outlistname, recipe.output)
 	else
 		local pos = minetest.get_player_by_name(name):get_pos()
-		minetest.chat_send_player(name, "No room in inventory!")
+		minetest.chat_send_player(name, S("No room in inventory!"))
 		minetest.add_item(pos, recipe.output)
 	end
 	return true
