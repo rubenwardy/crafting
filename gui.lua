@@ -161,6 +161,18 @@ function crafting.make_result_selector(player, type, level, size, context)
 	return table.concat(formspec, "")
 end
 
+local function sanitize(badstring)
+   local disallowed = { "\\", "{", "}", "^", ";",
+			--lua magic characters
+			"%(", "%)", "%[", "%]", "%.", "%$",
+			"%^", "%%", "%+", "%-", "%*", "%?"  }
+   badstring:trim():lower()
+   for i in ipairs(disallowed) do
+      badstring = badstring:gsub(disallowed[i],"")
+   end
+   return badstring
+end
+
 function crafting.result_select_on_receive_results(player, type, level, context, fields)
 	if fields.prev then
 		context.crafting_page = (context.crafting_page or 1) - 1
@@ -169,7 +181,7 @@ function crafting.result_select_on_receive_results(player, type, level, context,
 		context.crafting_page = (context.crafting_page or 1) + 1
 		return true
 	elseif fields.search or fields.key_enter_field == "query" then
-		context.crafting_query = fields.query:trim():lower()
+		context.crafting_query = sanitize(fields.query)
 		context.crafting_page  = 1
 		if context.crafting_query == "" then
 			context.crafting_query = nil
